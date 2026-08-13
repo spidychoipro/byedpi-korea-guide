@@ -70,19 +70,25 @@ no_proxy=localhost,127.0.0.1,::1
 
 ### Chromium 계열 브라우저 (Brave/Chrome)
 
-Hyprland 등 GSettings를 못 읽는 환경에서는 브라우저 실행 플래그로 지정.
-`~/.config/brave-flags.conf` (Brave는 `/usr/bin/brave` 래퍼가 이 파일을 읽음):
+**플래그를 하드코딩하지 말 것.** Brave는 GSettings 시스템 프록시를 실시간 반영하므로,
+아래 "원클릭 토글" 스크립트가 `org.gnome.system.proxy`를 켜고 끌 뿐 브라우저 재시작이 불필요하다.
+(과거 방식: `~/.config/brave-flags.conf`에 `--proxy-server=socks5://127.0.0.1:1080` 추가 —
+따옴표를 붙이면 `ERR_NO_SUPPORTED_PROXIES` 발생, 변경 후 완전 재시작 필요. 플래그를 고정하면
+byedpi를 껐을 때 브라우저가 죽은 프록시를 바라봐서 인터넷 전체가 끊기므로 권장하지 않음)
 
-```
---disable-session-crashed-bubble
---disable-restore-session-state
---force-device-scale-factor=0.8
---ozone-platform=wayland
---proxy-server=socks5://127.0.0.1:1080
+## 원클릭 토글
+
+`byedpi.sh`를 PATH에 설치 (`ln -s ~/byedpi/byedpi.sh ~/.local/bin/byedpi`):
+
+```bash
+byedpi start   # 우회 켜기
+byedpi stop    # 우회 끄기
+byedpi status  # 상태 확인 (차단 사이트로 실측)
+byedpi heat    # CPU 온도/부하 확인
 ```
 
-주의: 따옴표를 붙이면 `ERR_NO_SUPPORTED_PROXIES` 발생. 따옴표 없이 한 줄이 하나의 인자.
-변경 후 반드시 Brave를 완전히 종료(`pkill -f brave`) 후 재실행.
+`start`: byedpi 서비스 실행 + GSettings 프록시를 manual(socks 127.0.0.1:1080)로
+`stop`: 서비스 중지 + GSettings 프록시를 none으로 (일반 인터넷은 그대로, 차단 사이트만 막힘)
 
 ## 검증
 
